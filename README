@@ -1,0 +1,5 @@
+Collection of clustering algorithms for IU SOCS talk. Includes open-source
+Python implementations of:
+* k-means nearest neighbor (MacQueen 1967)
+* qt-clust (Heyer et al 1999)
+* information-theoretic clustering (Gokcay & Principe 2002)
