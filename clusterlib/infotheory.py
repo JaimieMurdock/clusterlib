@@ -148,6 +148,7 @@ def mutual_information(x, y):
     Shared Information Distance
     """
     # H(X) + H(Y) - 2I(X, Y)
+    raise NotImplementedError
 
 def distribution(n, d=2):
     """ Generates a random distribution of size n. """
