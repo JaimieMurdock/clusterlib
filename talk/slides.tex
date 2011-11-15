@@ -1,6 +1,12 @@
 \documentclass{beamer}
 \usetheme{CambridgeUS}
 
+\usepackage{listings}
+\lstset{
+    language=Python,
+    basicstyle=\footnotesize
+}
+
 \title{Categorization}
 \author{Jaimie Murdock}
 \institute[IU COGS]{
@@ -181,7 +187,32 @@ Repeat until convergence of assignment
 % TODO: Insert images of clustering process
 \end{frame}
 
-% TODO: Insert code walkthrough
+\begin{frame}[fragile]
+\frametitle{Data Structures}
+\begin{lstlisting}
+class Concept(object):
+    # initialize the wrapper
+    def __init__(self, value):
+        self.value = value
+        self._cluster = None
+        self._previous_cluster = None
+
+    # Properties to track cluster assignments
+    @property
+    def cluster(self):
+        return self._cluster
+        
+    @cluster.setter
+    def cluster(self, value):
+        """ Track previous cluster assignment auto-magically. """
+        self._previous_cluster = self._cluster
+        self._cluster = value
+    
+    @property
+    def previous_cluster(self):
+        return self._previous_cluster
+\end{lstlisting}
+\end{frame}
 
 \subsection{QT--clust}
 \begin{frame}
