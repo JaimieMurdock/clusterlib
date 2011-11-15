@@ -1,1 +1,10 @@
 *.pyc
+
+*.aux
+*.dvi
+*.log
+*.nav
+*.out
+*.pdf
+*.snm
+*.toc
