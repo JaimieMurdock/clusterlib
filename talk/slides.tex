@@ -1,0 +1,223 @@
+\documentclass{beamer}
+\usetheme{CambridgeUS}
+
+\title{Categorization}
+\author{Jaimie Murdock}
+\institute[IU COGS]{
+    IU Cognitive Science Program\\
+    810 Eigenmann Hall\\
+    \texttt{jammurdo@indiana.edu}
+    }
+\date{November 15, 2011}
+
+\begin{document}
+% Title Page
+\frame{\titlepage}
+
+\section{Introduction}
+\begin{frame}
+"Issues related to concepts and categorization are nearly ubiquitous in
+psychology because of people's natural tendancy to perceive a thing as
+something." - Goldstone \& Kersten 2003
+\end{frame}
+
+\begin{frame}
+\frametitle{Different names for the same thing...}
+\begin{itemize}
+  \item{Categorization}
+  \item{Classification \tiny{(machine learning)}}
+  \item{Clustering \tiny{(data mining)}}
+  \item{Partitioning \tiny{(mathematics)}}
+  \pause
+  \item{Chunking \tiny{(memory)}}
+  \item{Object Recognition \tiny{(vision)}}
+  \item{Semantics \tiny{(linguistics)}}
+  \item{Named Entity Recognition \tiny{(natural language processing)}}
+\end{itemize}
+
+\end{frame}
+
+\subsection{Definitions}
+\begin{frame}
+\frametitle{What is categorization?}
+
+\begin{itemize}
+  \item{The assignment of concepts to categories}
+  \item{``Seeing something as X'' - Wittgenstein, \textit{Philosophical Investigations}}
+  
+  \pause
+  \bigskip
+
+  \item{\textbf{What is a concept?}\\
+        Whatever psychological state signifies thoughts of X}
+  \item{\textbf{What is a category?}\\
+        All entities that are appropriately categorized as X}
+\end{itemize}
+\end{frame}
+
+\subsection{Models}
+\begin{frame}
+\frametitle{Prototypes vs. Exemplars}
+\begin{columns}
+\begin{column}{.5\textwidth}
+\textbf{Prototype Model}\\
+Do concepts determine categories? (Lakoff 1987)
+\end{column}
+\pause
+\begin{column}{.5\textwidth}
+\textbf{Exemplar Model}\\
+Do categories determine concepts? (Nosofsky 1984)
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{Utility}
+\begin{frame}
+\frametitle{Why do we categorize?}
+\begin{itemize}
+  \item{Components of thought}
+  \pause
+  \item{Inductive Predictions}
+  \pause
+  \item{Communication}
+  \pause
+  \item{Cognitive Economy}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Equivilence Classes}
+Distinguishable stimuli can become treated as the same thing once they are placed in the same category (Sidman 1994)\\
+
+\bigskip
+\pause
+
+\textbf{Biology} - taxonomy (kingdom, phylum, class, order, family, genus, species)\\
+
+\bigskip
+\pause
+
+\textbf{Things to remove from a burning house} - photographs, children, pets\\
+
+\bigskip
+\pause
+
+Equivilence classes may not be uniquely human - sea lions (Schusterman, Reichmuth, Kastak 2000)
+\end{frame}
+
+\subsection{Representations}
+\begin{frame}
+\frametitle{Representations}
+How are categories represented?
+
+\begin{itemize}
+  \item{rules}
+  \pause
+  \item{exemplars}
+  \pause
+  \item{prototypes}
+  \pause
+  \item{boundaries}
+% TODO: Insert Figure 22.1
+\end{itemize}
+\end{frame}
+
+\section{Algorithms}
+\subsection{Introduction}
+\begin{frame}
+\frametitle{Algorithms}
+A process to assign concepts to categories\\
+
+\pause
+
+\begin{itemize}
+  \item{k-means Nearest Neighbors \tiny{(MacQueen 1967)}}
+  \item{QT-clust \tiny{(Heyer et al. 1999)}}
+  \item{Information Theoretic Clustering \tiny{(Gokcay \& Princip\'{e} 2002)}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Components}
+Two key decisions in clustering:
+\begin{columns}
+\begin{column}{.5\textwidth}
+\textbf{distance function}
+\begin{itemize}
+  \item Euclidean distance
+  \item semantic similarity
+  \item cross-entropy
+\end{itemize}
+\end{column}
+\begin{column}{.5\textwidth}
+\textbf{cluster assignment}
+\begin{itemize}
+  \item nearest neighbor
+  \item minimal diameter
+  \item maximize cross-cluster distance
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{k-means Nearest Neighbors}
+\begin{frame}
+\frametitle{k-means Nearest Neighbors}
+Given $n$ items, place into $k$ groups\\
+
+\bigskip
+
+\textbf{Initialize:} Pick $k$ centroids\\
+\textbf{Assign:} Assign items to nearest centroid\\
+\textbf{Update:} Recalculate centroids\\
+
+\bigskip
+
+Repeat until convergence of assignment
+
+\end{frame}
+
+\begin{frame}
+% TODO: Insert images of clustering process
+\end{frame}
+
+% TODO: Insert code walkthrough
+
+\subsection{QT-clust}
+\begin{frame}
+\frametitle{QT-clust}
+Given $n$ items, place into groups of $\epsilon$ diameter\\
+
+\bigskip
+
+\textbf{Build:} for each $i \in n$, build candidate cluster $C_i$ \\
+\textbf{Select:} pick largest $C_i$, remove elements from popuation \\
+
+\bigskip
+
+Repeat until all items are assigned.
+
+\end{frame}
+
+% TODO: Insert images of clustering process
+% TODO: Insert code walkthrough
+
+\subsection{Information Theoretic}
+\begin{frame}
+Given $n$ items, place into $k$ groups, minimizing the value of the cross-entropy function (CEF) \\
+
+\bigskip
+
+\textbf{Initialize:} Assign all items to random clusters
+\textbf{Group:} for each $i \in n$, build group $G_i$ of size $M = n / k$ \\
+\textbf{Reassign:} for each $i \in n$, see if switching $G_i$ reduces $CEF$, permanently switch cluster assignment for $x \in G_i$ which minimizes $CEF$ \\
+
+\bigskip
+
+Repeat until $CEF$ reaches minima
+\end{frame}
+
+% TODO: Insert images of clustering process
+% TODO: Insert code walkthrough
+
+\end{document}
