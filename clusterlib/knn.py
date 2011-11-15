@@ -72,3 +72,24 @@ def get_centroids(population, k):
    
     return new_centroids
 
+def distribution(n, d=2):
+    """ Generates a random distribution of size n. """
+    # autogenerate a mean
+    mean = math.log(random.random() * n)
+
+    # autogenerate a stddev
+    stddev = math.log(random.random() * n)
+
+    return [[random.normalvariate(mean, stddev + j) for j in range(d)]
+                for i in range(n)]
+
+if __name__ == '__main__':
+    population = distribution(1000) 
+
+    # initialize population with cluster storage representation
+    population = [Concept(x) for x in population]
+
+    # cluster the population!
+    population = kmeans(3, population)
+    for i, centroid in enumerate(get_centroids(population, 3)):
+        print i, centroid
