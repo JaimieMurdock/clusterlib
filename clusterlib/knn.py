@@ -1,9 +1,13 @@
 """
 Implementation of the k-means nearest neighbor algorithm.
 """
+from __future__ import division
 import math
 from operator import itemgetter, attrgetter
 import random
+import subprocess
+
+from matplotlib import pyplot
 
 from distance import euclidean as distance
 
@@ -54,6 +58,10 @@ def kmeans(k, population, min_delta=0):
     # we initialize delta to the length of the population
     delta = len(population)
 
+    # track how many iterations until convergence
+    iterations = 0
+    plot(population, k, iterations, centroids)
+
     # test for convergence
     while delta > min_delta:
         # assign population to centroids
@@ -64,6 +72,10 @@ def kmeans(k, population, min_delta=0):
 
         # update centroids
         centroids = update_centroids(population, centroids)
+       
+        #plot the data
+        iterations += 1
+        plot(population, k, iterations)
 
     return population
 
@@ -106,6 +118,44 @@ def get_centroids(population, k):
    
     return new_centroids
 
+def plot(population, k, n, centroids=None):
+    """
+    Create plot of k-means nearest neighbor clustering process.
+    """
+    pyplot.title('knn after %d iterations' % n)
+    axes = pyplot.axes()
+
+    unchanged = [x for x in population if x.cluster == x.previous_cluster 
+                                           and x.cluster is not None]
+    if unchanged:
+        xs, ys = zip(*map(attrgetter('value'), unchanged))
+        cs = [x.cluster / k for x in unchanged]
+        axes.scatter(xs, ys, c=cs, cmap='Paired', marker='o', alpha=0.75)
+
+    changed = [x for x in population if x.cluster != x.previous_cluster]
+    if changed:
+        xs, ys = zip(*map(attrgetter('value'), changed))
+        cs = [x.cluster / k for x in changed]
+        axes.scatter(xs, ys, s=100, c=cs, cmap='Paired', marker='o', alpha=1.0)
+    
+    unassigned = [x for x in population if x.cluster is None]
+    if unassigned:
+        xs, ys = zip(*map(attrgetter('value'), unassigned))
+        axes.scatter(xs, ys, c='grey', marker='o', alpha=0.5)
+
+    if centroids is None:
+        centroids = get_centroids(population, k)
+    cxs, cys = zip(*centroids)
+    ccs = range(k)
+    axes.scatter(cxs, cys, s=300, c=ccs, cmap='Paired', marker='^')
+
+    # save to file
+    pyplot.savefig('plots/%d.png' % n)
+
+    # clear the axes
+    pyplot.cla()
+
+
 def distribution(n, d=2):
     """ Generates a random distribution of size n. """
     # autogenerate a mean
@@ -118,12 +168,18 @@ def distribution(n, d=2):
                 for i in range(n)]
 
 if __name__ == '__main__':
-    population = distribution(1000) 
+    import sys
+    random.seed(42)
+    population = distribution(10000) 
 
     # initialize population with cluster storage representation
     population = [Concept(x) for x in population]
 
     # cluster the population!
-    population = kmeans(3, population)
-    for i, centroid in enumerate(get_centroids(population, 3)):
+    k = int(sys.argv[-1])
+    population = kmeans(k, population)
+    for i, centroid in enumerate(get_centroids(population, k)):
         print i, centroid
+
+    subprocess.call(("mencoder mf://%s/*.png -o output%d.avi -mf type=png:w=800:h=600:fps=5 -ovc x264 -x264encopts qp=20" % ('plots', k) ).split())
+
