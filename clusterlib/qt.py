@@ -3,8 +3,14 @@ Implementation of the QT Clust algorithm (Heyer et al 1999)
 
 Prototype model
 """
+from __future__ import division
 import math
+from operator import attrgetter
 import random
+import subprocess
+
+from matplotlib import pyplot
+from matplotlib.colors import Normalize
 
 from distance import euclidean as distance
 
@@ -75,23 +81,71 @@ def qt_clust(thresh, population):
     
         yield candidate
 
+def plot(population, prototype=None, iteration=0, total=1):
+    """
+    Create plot of qt-clust clustering process
+    """
+    pyplot.title('qt after %d iterations' % iteration)
+    axes = pyplot.axes()
+
+    if prototype is None:
+        xs, ys = zip(*map(attrgetter('value'), population))
+        axes.scatter(xs, ys, c='grey', marker='o', alpha=0.5)
+
+    else:
+        xs, ys = zip(*map(attrgetter('value'), population))
+        color = iteration / total
+        print color
+        cs =  [color for x in population]
+        #plot population
+        axes.scatter(xs, ys, c=cs, cmap='Paired', marker='o', norm=Normalize(0, 1))
+        #plot prototype
+        axes.scatter([prototype.value[0]], [prototype.value[1]], s=100,
+                     c=[color], cmap='Paired', marker='o', norm=Normalize(0, 1))
+        
+        #plot centroid
+        cluster_values = [x.value for x in population]
+        # generate the new centroid by taking the average of all exemplars
+        # comprising the cluster. First, sum the dimensions:
+        centroid = map(sum, zip(*cluster_values))
+
+        # then take the average:
+        centroid = [dimension / len(cluster_values) for dimension in centroid]  
+        axes.scatter([centroid[0]], [centroid[1]], s=200,
+                     c=[color], cmap='Paired', marker='^', norm=Normalize(0, 1))
+
+    # save to file
+    pyplot.savefig('plots/%d.png' % iteration)
+
+stddev = 3
+
 def distribution(n, d=2):
     """ Generates a random distribution of size n. """
     # autogenerate a mean
     mean = math.log(random.random() * n)
 
     # autogenerate a stddev
+    global stddev
     stddev = math.log(random.random() * n)
 
     return [[random.normalvariate(mean, stddev + j) for j in range(d)]
                 for i in range(n)]
 
 if __name__ == '__main__':
-    population = distribution(100) 
+    import sys
+    random.seed(42)
+    population = distribution(10000) 
 
     # initialize population with cluster storage representation
     population = [Concept(x) for x in population]
+    plot(population)
 
     # cluster the population!
-    for prototype in qt_clust(3, population):
+    thresh = float(sys.argv[-1])
+    clusters = list(qt_clust(thresh*stddev, population))
+    for i, prototype in enumerate(clusters):
         print len(prototype.cluster), prototype
+        plot(prototype.cluster, prototype, i, len(clusters))
+    
+    subprocess.call(("mencoder mf://%s/*.png -o output_qt%f.avi -mf type=png:w=800:h=600:fps=5 -ovc x264 -x264encopts qp=20" % ('plots', thresh) ).split())
+
