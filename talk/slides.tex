@@ -313,8 +313,86 @@ Repeat until all items are assigned.
 
 \end{frame}
 
-% TODO: Insert images of clustering process
-% TODO: Insert code walkthrough
+\begin{frame}[fragile]
+\frametitle{Data Structures}
+\begin{minted}[fontsize=\footnotesize]{python}
+class Concept(object):
+    # initialize the wrapper
+    def __init__(self, value):
+        self.value = value
+        self.cluster = [self] 
+        self.diameter = 0.0
+    
+    def _diameter_append(self, candidate):
+        return max([distance(candidate.value, x.value) 
+                       for x in self.cluster])
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The Main Loop}
+\begin{minted}[fontsize=\footnotesize]{python}
+def qt_clust(thresh, population):
+    while population:
+        # build candidate clusters
+        for x in population:
+            x.build_cluster(population, thresh)
+    
+        # select the largest candidate cluster
+        candidate = max(population, key=lambda x: len(x.cluster))
+  
+        # remove elements from the population
+        for x in candidate.cluster:
+            population.remove(x)
+    
+        yield candidate
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Build}
+\begin{minted}[fontsize=\footnotesize]{python}
+class Concept(object):
+    def build_cluster(self, population, thresh):
+        # initialize the cluster
+        self.cluster = [self]
+        population.remove(self)
+
+        while population:
+            # find x, such that cluster diameter is minimized
+            x = min(population, key=self._diameter_append)
+            new_diameter = self._diameter_append(x)
+
+            # if below quality threshold, append to cluster
+            if new_diameter < thresh:
+                self.cluster.append(x)
+                self.diameter = new_diameter
+                population.remove(x)
+            else:
+                # otherwise terminate the loop
+                break
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The Main Loop}
+\begin{minted}[fontsize=\footnotesize]{python}
+def qt_clust(thresh, population):
+    while population:
+        # build candidate clusters
+        for x in population:
+            x.build_cluster(population, thresh)
+    
+        # select the largest candidate cluster
+        candidate = max(population, key=lambda x: len(x.cluster))
+  
+        # remove elements from the population
+        for x in candidate.cluster:
+            population.remove(x)
+    
+        yield candidate
+\end{minted}
+\end{frame}
 
 \subsection{Information Theoretic Clustering}
 \begin{frame}
@@ -331,7 +409,92 @@ Given $n$ items, place into $k$ groups, minimizing the value of the cross-entrop
 Repeat until $CEF$ reaches minima
 \end{frame}
 
-% TODO: Insert images of clustering process
-% TODO: Insert code walkthrough
+\begin{frame}[fragile]
+\frametitle{Data Structures}
+\begin{minted}[fontsize=\footnotesize]{python}
+class Concept(object):
+    # initialize the wrapper
+    def __init__(self, value):
+        self.value = value
+        self.cluster = None 
+        self.group = [self]
+    
+    def _diameter_append(self, candidate):
+        return min([distance(candidate.value, x.value) 
+                       for x in self.group])
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The Main Loop}
+\begin{minted}[fontsize=\footnotesize]{python}
+def info_theory(k, population):
+    # assign random clusters
+    for x in population:
+        x.cluster = random.choice(range(k))
+
+    # create initial group size
+    group_size = len(population) / k
+   
+    # grow group size exponentially while hill-climbing
+    while group_size < len(population):
+        # assign groups
+        for x in population:
+            x.make_group(population, group_size)
+
+        hillclimb(population, group_size, k)
+        group_size *= 2
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Hill Climbing}
+\begin{minted}[fontsize=\footnotesize]{python}
+def hillclimb(population, group_size, k):
+    orig_CEF = 1.0                  # get baseline CEF
+    min_CEF = CEF(population, k)    # initial min CEF
+
+    while orig_CEF != min_CEF:
+        for x in population:
+            for member in x.group:
+                # change cluster assignment
+                member.cluster = x.cluster
+    
+            group_CEF = CEF(population, k)
+            if group_CEF < min_CEF:
+                # if CEF decreases, new min!
+                min_CEF = group_CEF
+            else:
+                # restore previous cluster assignment
+                for member in x.group:
+                    member.cluster = x.previous_cluster
+
+        orig_CEF = min_CEF    # set orig to new minima
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The Main Loop}
+\begin{minted}[fontsize=\footnotesize]{python}
+def info_theory(k, population):
+    # assign random clusters
+    for x in population:
+        x.cluster = random.choice(range(k))
+
+    # create initial group size
+    group_size = len(population) / k
+   
+    # grow group size exponentially while hill-climbing
+    while group_size < len(population):
+        # assign groups
+        for x in population:
+            x.make_group(population, group_size)
+
+        hillclimb(population, group_size, k)
+        group_size *= 2
+\end{minted}
+\end{frame}
+
+\frame{\tableofcontents}
 
 \end{document}
