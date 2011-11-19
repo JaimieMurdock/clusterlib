@@ -7,6 +7,8 @@ from operator import itemgetter, attrgetter
 import random
 import subprocess
 
+import matplotlib
+matplotlib.use('agg')
 from matplotlib import pyplot
 
 from distance import euclidean as distance
@@ -150,7 +152,7 @@ def plot(population, k, n, centroids=None):
     axes.scatter(cxs, cys, s=300, c=ccs, cmap='Paired', marker='^')
 
     # save to file
-    pyplot.savefig('plots/%d.png' % n)
+    pyplot.savefig('plots/%05d.png' % n)
 
     # clear the axes
     pyplot.cla()
@@ -170,7 +172,7 @@ def distribution(n, d=2):
 if __name__ == '__main__':
     import sys
     random.seed(42)
-    population = distribution(10000) 
+    population = distribution(1000) 
 
     # initialize population with cluster storage representation
     population = [Concept(x) for x in population]
@@ -181,5 +183,5 @@ if __name__ == '__main__':
     for i, centroid in enumerate(get_centroids(population, k)):
         print i, centroid
 
-    subprocess.call(("mencoder mf://%s/*.png -o output%d.avi -mf type=png:w=800:h=600:fps=5 -ovc x264 -x264encopts qp=20" % ('plots', k) ).split())
+    subprocess.call(("mencoder mf://%s/*.png -o output%d.avi -mf type=png:w=800:h=600:fps=3 -ovc x264 -x264encopts qp=20" % ('plots', k) ).split())
 

@@ -9,6 +9,8 @@ from operator import attrgetter
 import random
 import subprocess
 
+import matplotlib
+matplotlib.use('agg')
 from matplotlib import pyplot
 from matplotlib.colors import Normalize
 
@@ -115,7 +117,7 @@ def plot(population, prototype=None, iteration=0, total=1):
                      c=[color], cmap='Paired', marker='^', norm=Normalize(0, 1))
 
     # save to file
-    pyplot.savefig('plots/%d.png' % iteration)
+    pyplot.savefig('plotsqt/%05d.png' % iteration)
 
 stddev = 3
 
@@ -134,7 +136,7 @@ def distribution(n, d=2):
 if __name__ == '__main__':
     import sys
     random.seed(42)
-    population = distribution(10000) 
+    population = distribution(100) 
 
     # initialize population with cluster storage representation
     population = [Concept(x) for x in population]
@@ -147,5 +149,5 @@ if __name__ == '__main__':
         print len(prototype.cluster), prototype
         plot(prototype.cluster, prototype, i, len(clusters))
     
-    subprocess.call(("mencoder mf://%s/*.png -o output_qt%f.avi -mf type=png:w=800:h=600:fps=5 -ovc x264 -x264encopts qp=20" % ('plots', thresh) ).split())
+    subprocess.call(("mencoder mf://%s/*.png -o output_qt%f.avi -mf type=png:w=800:h=600:fps=3 -ovc x264 -x264encopts qp=20" % ('plotsqt', thresh) ).split())
 
