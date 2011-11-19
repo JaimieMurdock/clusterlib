@@ -8,7 +8,8 @@
 \institute[IU COGS]{
     IU Cognitive Science Program\\
     810 Eigenmann Hall\\
-    \texttt{jammurdo@indiana.edu}
+    \texttt{jammurdo@indiana.edu}\\
+    \texttt{http://github.com/JaimieMurdock/clusterlib}
     }
 \date{November 15, 2011}
 
@@ -218,13 +219,13 @@ def kmeans(k, population, min_delta=0):
     while delta > min_delta:
         # assign population to clusters
         assign_clusters(population, centroids)
+
+        # update centroids
+        centroids = update_centroids(population, centroids)
         
         # get number of elements which switched cluster
         delta = len([x for x in population 
                          if x.cluster != x.previous_cluster])
-
-        # update centroids
-        centroids = update_centroids(population, centroids)
 \end{minted}
 \end{frame}
 
@@ -287,13 +288,13 @@ def kmeans(k, population, min_delta=0):
     while delta > min_delta:
         # assign population to clusters
         assign_clusters(population, centroids)
+
+        # update centroids
+        centroids = update_centroids(population, centroids)
         
         # get number of elements which switched cluster
         delta = len([x for x in population 
                          if x.cluster != x.previous_cluster])
-
-        # update centroids
-        centroids = update_centroids(population, centroids)
 \end{minted}
 \end{frame}
 
