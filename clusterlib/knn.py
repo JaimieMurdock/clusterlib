@@ -66,12 +66,12 @@ def kmeans(k, population, min_delta=0):
     while delta > min_delta:
         # assign population to centroids
         assign_clusters(population, centroids)
-        
-        # get number of elements which switched cluster
-        delta = len([x for x in population if x.cluster != x.previous_cluster])
 
         # update centroids
         centroids = update_centroids(population, centroids)
+        
+        # get number of elements which switched cluster
+        delta = len([x for x in population if x.cluster != x.previous_cluster])
        
         #plot the data
         iterations += 1
